@@ -1,0 +1,87 @@
+#include <iostream> // Para entrada y salida Estandar de valores
+#include <vector> // Para utilizar contenedores tipo vector 
+#include <sstream> // Para convertir cadenas de texto a flujo (procesar la entrada del usuario)
+#include <algorithm> // Para manipular los contenedores, constantes y variables
+
+using namespace std;
+
+const int SIZE = 4; // Aqui estamos definiendo el tamaño del Sudoku (4X4)
+
+// Función para mostrar la cuadrícula
+void printGrid(const vector<vector<int>>& grid) { // Aqui se imprime la cuadricula actual, imprimiendo en cada posicion correspondiente
+    cout << "\nCuadrícula actual:\n";
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            cout << grid[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+// Función para verificar si un número es válido en la posición dada
+bool isValid(const vector<vector<int>>& grid, int row, int col, int num) { // Parte donde se verifica si colocar el numero en X cuadricula es valido.
+    // Verificar fila y columna
+    for (int i = 0; i < SIZE; i++) {
+        if (grid[row][i] == num || grid[i][col] == num) {
+            return false;
+        }
+    }
+
+    // Verificar subcuadrícula
+    int startRow = row - row % 2;
+    int startCol = col - col % 2;
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            if (grid[i + startRow][j + startCol] == num) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Función principal del juego
+int main() {
+    vector<vector<int>> grid(SIZE, vector<int>(SIZE, 0));
+
+    // Configuración inicial
+    grid[0][0] = 1; grid[0][1] = 2; grid[1][0] = 3; grid[1][1] = 4;
+
+    string input;
+    int row, col, num;
+
+    while (true) {
+        printGrid(grid);
+        cout << "\nPara hacer un movimiento, ingresa 'fila columna numero' (por ejemplo, '0 1 3').\n";
+        cout << "Escribe 'salir' para terminar el juego.\n";
+        cout << "Tu movimiento: ";
+        
+        getline(cin, input); // Se agrega esta funcion para leer toda la línea de entrada
+
+        // Esta seccion se agrego para eliminar espacios en blanco al inicio y al final de la entrada
+        input.erase(0, input.find_first_not_of(" \t\n\r\f\v")); 
+        input.erase(input.find_last_not_of(" \t\n\r\f\v") + 1); 
+
+        if (input == "salir") break; // Agregamos la opcion para salir del juego si el usuario escribe "salir"
+
+        istringstream iss(input); // se agrega la siguiente opcion para convertir la entrada a un flujo y asi extraer los números
+        if (iss >> row >> col >> num) { // Aca se intenta extraer los numeros
+            if (row >= 0 && row < SIZE && col >= 0 && col < SIZE && num >= 1 && num <= 4) {
+                if (isValid(grid, row, col, num)) {
+                    grid[row][col] = num;
+                    cout << "Movimiento agregado.\n";
+                } else {
+                    cout << "Movimiento inválido. Intenta de nuevo.\n";
+                }
+            } else {
+                cout << "Los valores deben estar en el rango (fila y columna entre 0-3, número entre 1-4). Intenta de nuevo.\n";
+            }
+        } else {
+            cout << "Entrada no válida. Asegúrate de usar el formato 'fila columna numero'.\n";
+        }
+        // En esta linea de if, el programa da diferentes opciones para hacer el juego mas llevadero para el usuario.
+    }
+
+    cout << "Gracias por jugar!" << endl; //Despedida y Agradecimiento
+    return 0;
+}
